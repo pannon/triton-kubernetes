@@ -393,6 +393,23 @@ func newTritonManager(currentState state.State, name string) error {
 		cfg.MasterTritonMachinePackage = packages[i].Name
 	}
 
+    if viper.IsSet("proxy") {
+        cfg.Proxy = viper.GetString("proxy")
+    } else if nonInteractiveMode {
+        return errors.New("proxy must be specified")
+    } else {
+        prompt := promptui.Prompt{
+            Label:   "Proxy IP address",
+            Default: "127.0.0.1",
+        }
+
+        result, err := prompt.Run()
+        if err != nil {
+            return err
+        }
+        cfg.Proxy = result
+    }
+
 	currentState.SetManager(&cfg)
 
 	return nil
